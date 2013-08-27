@@ -2,6 +2,7 @@ fs = require "fs"
 express = require "express"
 http = require "http"
 assets = require "connect-assets"
+Log = require("./Log").SheppyCMS.Log
 
 
 root = exports ? this
@@ -58,7 +59,7 @@ class root.SheppyCMS.App
 
     start: ->
         http.createServer(@app).listen(@app.get("port"), () =>
-            console.log "Express server listening on port #{@app.get("port")}"
+            Log.success "Express", "server listening on port #{@app.get("port")}"
         )
 
 

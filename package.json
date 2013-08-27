@@ -15,6 +15,9 @@
     "express": "~3.3.6",
     "jade": "~0.35.0",
     "stylus": "~0.37.0",
-    "connect-assets": "~2.5.2"
+    "connect-assets": "~2.5.2",
+    "mongoose": "~3.6.18",
+    "colors": "~0.6.2",
+    "moment": "~2.1.0"
   }
 }
