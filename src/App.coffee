@@ -2,14 +2,10 @@ fs = require "fs"
 express = require "express"
 http = require "http"
 assets = require "connect-assets"
-Log = require("./Log").SheppyCMS.Log
+SheppyLog = require "./Log"
 
 
-root = exports ? this
-
-root.SheppyCMS ?= {}
-
-class root.SheppyCMS.App
+class SheppyApp
     app: null
     defaultPort: 3000
     paths:
@@ -59,7 +55,7 @@ class root.SheppyCMS.App
 
     start: ->
         http.createServer(@app).listen(@app.get("port"), () =>
-            Log.success "Express", "server listening on port #{@app.get("port")}"
+            SheppyLog.success "Express", "server listening on port #{@app.get("port")}"
         )
 
 
@@ -93,3 +89,6 @@ class root.SheppyCMS.App
                 status: err.status || 500
                 error: err if @app.settings.env == "development"
             }
+
+
+module.exports = SheppyApp
