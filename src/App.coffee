@@ -27,9 +27,9 @@ class SheppyApp
 
 
     configureApp: ->
-        @app.configure "development", @configureDevelopment
-        @app.configure "production", @configureProduction
-        @app.configure @configureGeneral
+        @app.configure "development", => @configureDevelopment()
+        @app.configure "production", => @configureProduction()
+        @app.configure => @configureGeneral()
 
 
     configureGeneral: ->

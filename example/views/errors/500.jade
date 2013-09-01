@@ -1,0 +1,8 @@
+extends ../layouts/main
+
+block content
+    h1= title
+        p The website has encountered an unexpected error or misconfiguration and was unable to complete your request.
+        p Please try again in a few minutes.
+        if error
+            pre: code=error
