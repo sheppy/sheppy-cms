@@ -15,7 +15,9 @@ npm-debug.log
 
 .idea
 node_modules
+build
+coverage/coverage.html
 atlassian-ide-plugin.xml
-*.js
+docroot/*.js
 *.map
 *.css

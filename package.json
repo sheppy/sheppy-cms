@@ -6,6 +6,12 @@
     "type": "git",
     "url": "git://github.com/sheppy/sheppy-cms.git"
   },
+  "scripts": {
+    "test": "grunt",
+    "travis-cov": {
+      "threshold": 80
+    }
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.7.0",
@@ -15,10 +21,18 @@
     "grunt-contrib-clean": "~0.5.0",
     "chai": "~1.7.2",
     "supertest": "~0.7.1",
-    "bcrypt": "~0.7.6"
+    "bcrypt": "~0.7.6",
+    "grunt-blanket": "0.0.8",
+    "grunt-mocha-cov": "0.0.7",
+    "grunt-mocha-test": "~0.6.3",
+    "blanket": "~1.1.5",
+    "travis-cov": "~0.2.4",
+    "sinon": "~1.7.3",
+    "sinon-chai": "~2.4.0",
+    "chai-as-promised": "~3.3.1"
   },
   "dependencies": {
-    "express": "~3.3.6",
+    "express": "~3.3.7",
     "jade": "~0.35.0",
     "stylus": "~0.37.0",
     "connect-assets": "~2.5.2",

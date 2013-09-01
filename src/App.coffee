@@ -2,11 +2,13 @@ fs = require "fs"
 express = require "express"
 http = require "http"
 assets = require "connect-assets"
+SheppyServer = require "./Server"
 SheppyLog = require "./Log"
 
 
 class SheppyApp
     app: null
+    server: null
     defaultPort: 3000
     paths:
         docroot: "#{__dirname}/../public"
@@ -16,13 +18,22 @@ class SheppyApp
 
 
     init: ->
+        @createExpressApp()
+        @configureApp()
+
+
+    createExpressApp: ->
         @app = express()
-        @app.configure "development", => @configureDevevlopment()
-        @app.configure "production", => @configureProduction()
-        @app.configure => @configureAll()
 
 
-    configureAll: ->
+    configureApp: ->
+        @app.configure "development", @configureDevelopment
+        @app.configure "production", @configureProduction
+        @app.configure @configureGeneral
+
+
+    configureGeneral: ->
+        ###
         @app.set "port", process.env.PORT || @defaultPort
         @app.set "views", @paths.views
         @app.set "view engine", "jade"
@@ -42,21 +53,20 @@ class SheppyApp
         @addCmsRoute()
         @add404Route()
         @add500Route()
+    ###
 
 
-    configureDevevlopment: ->
-        @app.use express.logger("dev")
-        @app.use express.errorHandler { dumpExceptions: true, showStack: true }
-
+    configureDevelopment: ->
 
     configureProduction: ->
-        @app.use express.errorHandler()
 
+    onStart: ->
+        SheppyLog.success "Express", "server listening on port #{@app.get("port")}"
 
     start: ->
-        http.createServer(@app).listen(@app.get("port"), () =>
-            SheppyLog.success "Express", "server listening on port #{@app.get("port")}"
-        )
+        @server = new SheppyServer @app.get("port")
+        @server.create @app
+        @server.start => @onStart()
 
 
     # Automatically include all of our routes

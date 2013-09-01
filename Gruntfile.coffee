@@ -62,8 +62,8 @@ module.exports = (grunt) ->
                     "level": "error"
 
         clean:
-            src: ["src/**/*.js"]
-            test: ["test/**/*.js"]
+            build: ["build/**/*.js"]
+            coverage: ["coverage/coverage.html"]
 
         coffee:
             src:
@@ -71,28 +71,38 @@ module.exports = (grunt) ->
                 flatten: true
                 cwd: "src"
                 src: "**/*.coffee"
-                dest: "src"
+                dest: "build/src"
                 ext: ".js"
             test:
                 expand: true
                 flatten: true
                 cwd: "test"
                 src: "**/*.coffee"
-                dest: "test"
+                dest: "build/test"
                 ext: ".js"
 
-        simplemocha:
-            all:
-                src: [
-                    "src/**/*.js"
-                    "test/**/*.js"
-                ]
+        mochaTest:
+            test:
                 options:
                     reporter: "spec"
-                    slow: 200
-                    timeout: 1000
-                    ignoreLeaks: false
-                    ui: "bdd"
+                    require: "coverage/blanket"
+                src: [
+                    "build/test/**/*.js"
+                ]
+            coverage:
+                options:
+                    reporter: "html-cov"
+                    quiet: true
+                    captureFile: "coverage/coverage.html"
+                src: [
+                    "build/test/**/*.js"
+                ]
+            "travis-cov":
+                options:
+                    reporter: "travis-cov"
+                src: [
+                    "build/test/**/*.js"
+                ]
 
         watch:
             test:
@@ -104,8 +114,8 @@ module.exports = (grunt) ->
     grunt.loadNpmTasks "grunt-coffeelint"
     grunt.loadNpmTasks "grunt-contrib-clean"
     grunt.loadNpmTasks "grunt-contrib-coffee"
-    grunt.loadNpmTasks "grunt-simple-mocha"
+    grunt.loadNpmTasks "grunt-mocha-test"
 
     # Register tasks
-    grunt.registerTask "test", ["clean", "coffeelint", "coffee", "simplemocha", "clean"]
+    grunt.registerTask "test", ["clean", "coffeelint", "coffee", "mochaTest"]
     grunt.registerTask "default", ["test"]
