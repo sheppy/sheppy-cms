@@ -1,30 +1,30 @@
-colors = require "colors"
+chalk = require "chalk"
 moment = require "moment"
 
 
 class SheppyLog
     @log: (message) ->
-        console.log "[#{moment().format("YYYY-MM-DD HH:mm:ss.SSS")}] ".italic + message
+        console.log chalk.italic("[" + moment().format("YYYY-MM-DD HH:mm:ss.SSS") + "]") + " " + message
 
     @noise: (title, message) ->
-        message = "#{title} :: ".bold + message
-        SheppyLog.log "#{message}".grey
+        message = chalk.bold("#{title} :: ") + message
+        SheppyLog.log chalk.gray("#{message}")
 
     @info: (title, message) ->
-        message = "#{title} :: ".bold + message
-        SheppyLog.log "#{message}".cyan
+        message = chalk.bold("#{title} :: ") + message
+        SheppyLog.log chalk.cyan("#{message}")
 
     @success: (title, message) ->
-        message = "#{title} :: ".bold + message
-        SheppyLog.log "#{message}".green
+        message = chalk.bold("#{title} :: ") + message
+        SheppyLog.log chalk.green("#{message}")
 
     @warn: (title, message) ->
-        message = "#{title} :: ".bold + message
-        SheppyLog.log "#{message}".yellow
+        message = chalk.bold("#{title} :: ") + message
+        SheppyLog.log chalk.yellow("#{message}")
 
     @error: (title, message) ->
-        message = "#{title} :: ".bold + message
-        SheppyLog.log "#{message}".red
+        message = chalk.bold("#{title} :: ") + message
+        SheppyLog.log chalk.red("#{message}")
 
 
 module.exports = SheppyLog

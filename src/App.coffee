@@ -1,15 +1,24 @@
 fs = require "fs"
 express = require "express"
 http = require "http"
+compression = require "compression"
+bodyParser = require "body-parser"
+methodOverride = require "method-override"
+responseTime = require "response-time"
+cookieParser = require "cookie-parser"
+helmet = require "helmet"
 assets = require "connect-assets"
+
 SheppyServer = require "./Server"
 SheppyLog = require "./Log"
+SheppyCMS = require "./CMS"
 
 
 class SheppyApp
     app: null
     server: null
     defaultPort: 3000
+    secretKey: "secretkey"
     paths:
         docroot: "#{__dirname}/../public"
         assets: "#{__dirname}/../public/assets"
@@ -27,20 +36,58 @@ class SheppyApp
 
 
     configureApp: ->
-        @app.configure "development", => @configureDevelopment()
-        @app.configure "production", => @configureProduction()
-        @app.configure => @configureGeneral()
+        @preConfigure()
+
+        if @app.settings.env == "development"
+            @configureDevelopment()
+        else
+            @configureProduction()
+
+        @postConfigure()
 
 
-    configureGeneral: ->
-        ###
+    preConfigure: ->
+
+
+    postConfigure: ->
         @app.set "port", process.env.PORT || @defaultPort
         @app.set "views", @paths.views
         @app.set "view engine", "jade"
-        @app.use express.bodyParser()
-        @app.use express.methodOverride()
-        @app.use @app.router
-
+        
+        @app.use compression() # Enable gzip
+        @app.use bodyParser.urlencoded({extended: true})
+        @app.use bodyParser.json()
+        @app.use helmet.xframe()
+        @app.use helmet.xssFilter()
+        @app.use helmet.nosniff()
+        @app.use helmet.hidePoweredBy()
+        @app.use helmet.crossdomain()
+        #@app.use helmet.nocache()
+        @app.use methodOverride()
+        @app.use responseTime()
+        @app.use cookieParser @secretKey
+        
+        ###
+        # Only initialise sessions on admin routes
+        @app.use (req, res, next) ->
+            if req.url.indexOf("/admin") == -1 then return next()
+            sessionMiddleware = session {
+                store: new MongoStore({
+                    mongoose_connection: mongoose.connection
+                })
+                key: "sid"
+                secret: "secretkey"
+            }
+            sessionMiddleware(req, res, next)
+    
+        @initPassport()
+        @loadRoutes()
+        CMS.initCmsRoutes @app
+        @addStaticRoute()
+        @add404Route()
+        @add500Route()
+        ###
+        
         @app.use assets {
             build: true
             src: @paths.docroot
@@ -53,7 +100,6 @@ class SheppyApp
         @addCmsRoute()
         @add404Route()
         @add500Route()
-    ###
 
 
     configureDevelopment: ->
@@ -61,7 +107,7 @@ class SheppyApp
     configureProduction: ->
 
     onStart: ->
-        SheppyLog.success "Express", "server listening on port #{@app.get("port")}"
+        SheppyLog.success "Express", "server listening on port " + @app.get("port")
 
     start: ->
         @server = new SheppyServer @app.get("port")
@@ -73,12 +119,11 @@ class SheppyApp
     loadRoutes: ->
         fs.readdirSync(@paths.routes).forEach (filename) =>
             @app.use require("#{@paths.routes}/#{filename}")(@app)
+            SheppyLog.success "Route", "\t✔ #{filename}"
 
 
     addCmsRoute: ->
-        @app.use (req, res, next) =>
-            # TODO: Look up the page in the CMS
-            return next()
+        SheppyCMS.initRoute @app
 
 
     add404Route: ->

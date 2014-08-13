@@ -1,32 +1,41 @@
 mongoose = require "mongoose"
 SheppyLog = require "./Log"
 
+# https://gist.github.com/prabirshrestha/6539888
 
 class SheppyDatabase
-    uri: "mongodb://localhost:27017/sheppy-cms"
-    connected: false
+    uri: null
+    sleep: 1000
+    timer: null
+
+    constructor: (@uri = "mongodb://localhost:27017/sheppy-cms") ->
+
 
     connect: ->
-        mongoose.connection.on "connecting", () ->
+        _connect = =>
+            mongoose.connect @uri, {server: {auto_reconnect: true}}
+
+        mongoose.connection.on "connecting", ->
             SheppyLog.info "MongoDB", "Connecting to database..."
 
         mongoose.connection.on "error", (error) ->
-            if @connected then SheppyLog.error "MongoDB", "Error in database connection: #{error}"
+            SheppyLog.error "MongoDB", "Error in database connection: #{error}"
             mongoose.disconnect()
 
-        mongoose.connection.on "connected", () =>
+        mongoose.connection.on "connected", ->
             SheppyLog.success "MongoDB", "database connected!"
-            @connected = true
 
-        mongoose.connection.on "reconnected", () ->
+        mongoose.connection.on "open", =>
+            clearTimeout @timer
+            
+        mongoose.connection.on "reconnected", ->
             SheppyLog.success "MongoDB", "database reconnected!"
 
-        mongoose.connection.on "disconnected", () ->
-            if @connected then SheppyLog.warn "MongoDB", "database disconnected!"
-            @connected = false
-            mongoose.connect @uri, {server: {auto_reconnect: true}}
+        mongoose.connection.on "disconnected", =>
+            SheppyLog.warn "MongoDB", "database disconnected!"
+            @timer = setTimeout _connect, @sleep
 
-        mongoose.connect @uri, {server: {auto_reconnect: true}}
+        _connect()
 
 
 module.exports = SheppyDatabase

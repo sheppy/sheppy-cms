@@ -13,9 +13,12 @@ results
 
 npm-debug.log
 
+.c9
 .idea
 node_modules
 build
+data
+mongod
 coverage/coverage.html
 atlassian-ide-plugin.xml
 docroot/*.js
