@@ -7,7 +7,7 @@ renderCmsPage = module.exports.renderCmsPage = (err, res, page, next, model = {}
     if !page
         #then return next() # 404
         SheppyLog.warn "CMS", "Page not found in database"
-        return next()
+        return next() # 404
 
     model.title ?= page.title
     model.metaDescription ?= page["meta-description"]

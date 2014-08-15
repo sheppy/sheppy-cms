@@ -83,11 +83,6 @@ class SheppyApp
             sessionMiddleware(req, res, next)
     
         @initPassport()
-        @loadRoutes()
-        CMS.initCmsRoutes @app
-        @addStaticRoute()
-        @add404Route()
-        @add500Route()
         ###
         
         @app.use assets {
