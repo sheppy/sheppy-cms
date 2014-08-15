@@ -4,7 +4,7 @@ moment = require "moment"
 
 class SheppyLog
     @log: (message) ->
-        console.log chalk.italic("[" + moment().format("YYYY-MM-DD HH:mm:ss.SSS") + "]") + " " + message
+        console.log chalk.gray("[" + moment().format("YYYY-MM-DD HH:mm:ss.SSS") + "]") + " " + message
 
     @noise: (title, message) ->
         message = chalk.bold("#{title} :: ") + message

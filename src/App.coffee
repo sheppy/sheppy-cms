@@ -12,6 +12,7 @@ assets = require "connect-assets"
 SheppyServer = require "./Server"
 SheppyLog = require "./Log"
 SheppyCMS = require "./CMS"
+MultiViews = require "./MultiViews"
 
 
 class SheppyApp
@@ -22,8 +23,8 @@ class SheppyApp
     paths:
         docroot: "#{__dirname}/../public"
         assets: "#{__dirname}/../public/assets"
-        routes: "#{__dirname}/../routes"
-        views: "#{__dirname}/../views"
+        routes: "#{__dirname}/routes"
+        views: "#{__dirname}/views"
 
 
     init: ->
@@ -51,8 +52,9 @@ class SheppyApp
 
     postConfigure: ->
         @app.set "port", process.env.PORT || @defaultPort
-        @app.set "views", @paths.views
         @app.set "view engine", "jade"
+        MultiViews @app # Enable multiple view directories
+        @app.set "views", [@paths.views, "#{__dirname}/views"]
         
         @app.use compression() # Enable gzip
         @app.use bodyParser.urlencoded({extended: true})
@@ -118,7 +120,7 @@ class SheppyApp
     # Automatically include all of our routes
     loadRoutes: ->
         fs.readdirSync(@paths.routes).forEach (filename) =>
-            @app.use require("#{@paths.routes}/#{filename}")(@app)
+            @app.use require "#{@paths.routes}/#{filename}"
             SheppyLog.success "Route", "\t✔ #{filename}"
 
 
